@@ -11,3 +11,6 @@ Interface uniquement (mobile-first) façon dashboard de "second cerveau".
 - **Mode sombre** natif (mémorisé)
 - **Composants "tiles"** cliquables (placeholder)
 - Aucun stockage ni logique — **UI seulement**.
+
+
+Routes ajoutées: /, /habits, /todo, /goals, /calendar, /training, /health, /settings.
