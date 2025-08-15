@@ -147,8 +147,10 @@ export default function Habits(){
   const progress = useMemo(()=> habits.length ? Object.values(done).filter(Boolean).length / habits.length : 0, [done, habits])
 
   /* --- Routine hebdo --- */
-  const [tmpl, setTmpl] = useState(()=> load('routine:template', defaultTemplate))
-  useEffect(()=> save('routine:template', tmpl), [tmpl])
+  const ROUTINE_KEY = 'routine:template:v2'; // nouvelle clé
+const [tmpl, setTmpl] = useState(()=> load(ROUTINE_KEY, defaultTemplate));
+useEffect(()=> save(ROUTINE_KEY, tmpl), [tmpl]);
+
 
   const todayWd = wd[new Date().getDay()]
   const [currentDay, setCurrentDay] = useState(todayWd)
