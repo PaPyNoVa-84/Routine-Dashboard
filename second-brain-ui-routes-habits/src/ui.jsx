@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react'
 import { motion } from 'framer-motion'
 import { Brain, SunMedium, Moon, CheckSquare, Target, CalendarDays, NotebookPen, BookOpen, Dumbbell, Apple, Settings, ChevronRight } from 'lucide-react'
+import { Routes, Route, Link, useLocation } from 'react-router-dom'
 
 function useDarkMode(){
   const [dark, setDark] = useState(()=>{
@@ -15,30 +16,22 @@ function useDarkMode(){
 }
 
 const tiles = [
-  { id:'habits', icon: <CheckSquare className='icon-tile' />, title:'Mes habitudes', subtitle:'& ma to‑do list' },
-  { id:'goals', icon: <Target className='icon-tile' />, title:'Mes objectifs', subtitle:'& mes notes' },
-  { id:'calendar', icon: <CalendarDays className='icon-tile' />, title:'Calendrier', subtitle:'plan de la semaine' },
-  { id:'reading', icon: <BookOpen className='icon-tile' />, title:'Mes lectures', subtitle:'résumés & idées' },
-  { id:'study', icon: <NotebookPen className='icon-tile' />, title:'Mes études', subtitle:'pistes et suivis' },
-  { id:'training', icon: <Dumbbell className='icon-tile' />, title:'Entraînement', subtitle:'sport & progrès' },
-  { id:'health', icon: <Apple className='icon-tile' />, title:'Santé', subtitle:'sommeil & routine' },
-  { id:'settings', icon: <Settings className='icon-tile' />, title:'Réglages', subtitle:'thème & presets' },
+  { id: 'habits',   href: '/habits',   icon: <CheckSquare className='icon-tile' />, title: 'Mes habitudes', subtitle: '& ma to-do list' },
+  { id: 'goals',    href: '/goals',    icon: <Target className='icon-tile' />,      title: 'Mes objectifs', subtitle: '& mes notes' },
+  { id: 'calendar', href: '/calendar', icon: <CalendarDays className='icon-tile' />,title: 'Calendrier',    subtitle: 'plan de la semaine' },
+  { id: 'todo',     href: '/todo',     icon: <CheckSquare className='icon-tile' />, title: 'Ma to-do',      subtitle: 'aujourd’hui & semaine' },
+  { id: 'training', href: '/training', icon: <Dumbbell className='icon-tile' />,    title: 'Entraînement',  subtitle: 'sport & progrès' },
+  { id: 'health',   href: '/health',   icon: <Apple className='icon-tile' />,       title: 'Santé',         subtitle: 'sommeil & routine' },
+  { id: 'settings', href: '/settings', icon: <Settings className='icon-tile' />,    title: 'Réglages',      subtitle: 'thème & presets' },
 ]
 
-function Tile({icon, title, subtitle}){
+function Tile({icon, title, subtitle, href}) {
   return (
-    <motion.button whileHover={{ y: -2 }} className="card w-full p-5 md:p-6 text-left">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="grid place-items-center h-12 w-12 rounded-2xl bg-zinc-100 dark:bg-zinc-800">{icon}</div>
-          <div>
-            <div className="font-semibold">{title}</div>
-            <div className="text-xs text-zinc-500">{subtitle}</div>
-          </div>
-        </div>
-        <ChevronRight className="h-5 w-5 text-zinc-400" />
-      </div>
-    </motion.button>
+    <motion.div whileHover={{ y: -2 }} className="card w-full p-5 md:p-6 text-left">
+      <Link to={href} className="block">
+        {/* ...le contenu existant... */}
+      </Link>
+    </motion.div>
   )
 }
 
