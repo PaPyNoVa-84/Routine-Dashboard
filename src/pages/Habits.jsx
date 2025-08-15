@@ -1,22 +1,27 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState, useCallback } from 'react'
 
-/* helpers localStorage */
+/* =========================
+   Helpers localStorage + date
+   ========================= */
 const todayKey = () => new Date().toISOString().slice(0,10)
 const load = (k, f) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : f } catch { return f } }
 const save = (k, v) => localStorage.setItem(k, JSON.stringify(v))
 
-/* HABITUDES – ta liste (D1) */
+/* =========================
+   Habitudes par défaut (ta liste)
+   ========================= */
 const defaultHabits = [
-  { id: 1, name: "Boire 1,5L d'eau" },
-  { id: 2, name: "Sport 30 min à 1h" },
-  { id: 3, name: "2h travail" },
-  { id: 4, name: "Famille" },
-  { id: 5, name: "Tâches ménagères" },
-  { id: 6, name: "Étirements" },
-];
+  { id:'h_water',   name:"Boire 1,5L d'eau" },
+  { id:'h_sport',   name:'Sport 30–60 min' },
+  { id:'h_work2h',  name:'2h travail' },
+  { id:'h_family',  name:'Famille' },
+  { id:'h_house',   name:'Tâches ménagères' },
+  { id:'h_stretch', name:'Étirements' },
+]
 
-
-/* ROUTINE – simple liste avec heures (F1) */
+/* =========================
+   Routine hebdo (simple liste avec heures)
+   ========================= */
 const defaultTemplate = {
   Mon: [
     { id:'mo1', time:'08:00', text:'Hydratation + lumière du jour' },
@@ -28,7 +33,7 @@ const defaultTemplate = {
 const wd = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
 const wdLabel = { Mon:'Lundi', Tue:'Mardi', Wed:'Mercredi', Thu:'Jeudi', Fri:'Vendredi', Sat:'Samedi', Sun:'Dimanche' }
 
-/* petit bloc section réutilisable */
+/* Petite section visuelle réutilisable */
 function Section({ title, right, children }) {
   return (
     <div className="card p-5 md:p-6">
@@ -41,7 +46,7 @@ function Section({ title, right, children }) {
   )
 }
 
-/* Progress ring (C2) – SVG simple */
+/* Progress ring pour % du jour (option C2) */
 function ProgressRing({ value=0, size=84, stroke=10 }) {
   const r = (size - stroke) / 2
   const c = 2 * Math.PI * r
@@ -50,23 +55,38 @@ function ProgressRing({ value=0, size=84, stroke=10 }) {
     <svg width={size} height={size}>
       <circle cx={size/2} cy={size/2} r={r} stroke="#e5e7eb" className="dark:stroke-zinc-800" strokeWidth={stroke} fill="none"/>
       <circle cx={size/2} cy={size/2} r={r} stroke="var(--accent)" strokeWidth={stroke} fill="none"
-              className="ring" strokeDasharray={c} strokeDashoffset={o} strokeLinecap="round"/>
-      <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" className="text-sm font-semibold">{Math.round(value*100)}%</text>
+              style={{transform:'rotate(-90deg)', transformOrigin:'50% 50%'}}
+              strokeDasharray={c} strokeDashoffset={o} strokeLinecap="round"/>
+      <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" className="text-sm font-semibold">
+        {Math.round(value*100)}%
+      </text>
     </svg>
   )
 }
 
+/* ====== utilitaire: ms jusqu'à minuit ====== */
+function msUntilMidnight() {
+  const now = new Date()
+  const next = new Date(now)
+  next.setHours(24, 0, 0, 0) // minuit prochain
+  return next.getTime() - now.getTime()
+}
+
+/* =========================
+   Composant principal
+   ========================= */
 export default function Habits(){
   const [tab, setTab] = useState('daily') // daily | week
 
-  /* Habitudes (D1) */
-const HABITS_KEY = 'habits:list:v2' // <- nouvelle version
-const [habits, setHabits] = useState(()=> load(HABITS_KEY, defaultHabits))
-useEffect(()=> save(HABITS_KEY, habits), [habits])
+  /* --- Habitudes (liste simple) --- */
+  const HABITS_KEY = 'habits:list:v2' // versionne la clé pour forcer les defaults si tu les changes
+  const [habits, setHabits] = useState(()=> load(HABITS_KEY, defaultHabits))
   const [done, setDone] = useState(()=> load('habits:done:'+todayKey(), {}))
   const [newHabit, setNewHabit] = useState('')
-  useEffect(()=> save('habits:list', habits), [habits])
+
+  useEffect(()=> save(HABITS_KEY, habits), [habits])
   useEffect(()=> save('habits:done:'+todayKey(), done), [done])
+
   const toggleHabit = id => setDone(d => ({ ...d, [id]: !d[id] }))
   const addHabit = ()=>{
     const n = newHabit.trim(); if(!n) return
@@ -75,24 +95,62 @@ useEffect(()=> save(HABITS_KEY, habits), [habits])
   const removeHabit = id => setHabits(h => h.filter(x => x.id!==id))
   const progress = useMemo(()=> habits.length ? Object.values(done).filter(Boolean).length / habits.length : 0, [done, habits])
 
-  /* Routine (F1 / G1 / H1) */
+  /* --- Routine hebdo --- */
   const [tmpl, setTmpl] = useState(()=> load('routine:template', defaultTemplate))
   useEffect(()=> save('routine:template', tmpl), [tmpl])
+
   const todayWd = wd[new Date().getDay()]
   const [currentDay, setCurrentDay] = useState(todayWd)
+
   const addStep = day => setTmpl(t => ({ ...t, [day]: [...(t[day]||[]), { id:crypto.randomUUID(), time:'09:00', text:'Nouvelle étape' }] }))
   const rmStep = (day,id) => setTmpl(t => ({ ...t, [day]: (t[day]||[]).filter(x => x.id!==id) }))
   const updStep = (day,id,patch) => setTmpl(t => ({ ...t, [day]: (t[day]||[]).map(x => x.id===id ? { ...x, ...patch } : x) }))
+
+  /* Checklist "aujourd'hui" depuis la routine */
   const [todayCheck, setTodayCheck] = useState(()=> load('routine:done:'+todayKey(), {}))
   useEffect(()=> save('routine:done:'+todayKey(), todayCheck), [todayCheck])
   const todayList = (tmpl[todayWd]||[]).sort((a,b)=> a.time.localeCompare(b.time))
 
+  /* ====== REMISE À ZÉRO ====== */
+
+  // Fonction centralisée : vide toutes les coches d'habitudes et de routine du jour
+  const hardReset = useCallback(() => {
+    // supprime les clés locales des coches
+    Object.keys(localStorage).forEach(k => {
+      if (k.startsWith('habits:done:') || k.startsWith('routine:done:')) {
+        localStorage.removeItem(k)
+      }
+    })
+    // remet les états React à vide
+    setDone({})
+    setTodayCheck({})
+    // mémorise la date afin d'éviter une boucle
+    localStorage.setItem('habits:lastDate', todayKey())
+  }, [])
+
+  // Au chargement, si la date a changé -> reset immédiat.
+  // Et on programme un reset automatique à minuit si l'app reste ouverte.
+  useEffect(() => {
+    const today = todayKey()
+    const last = localStorage.getItem('habits:lastDate')
+    if (last !== today) {
+      hardReset()
+    }
+    const t = setTimeout(() => {
+      hardReset() // minuit atteint
+    }, msUntilMidnight())
+    return () => clearTimeout(t)
+  }, [hardReset])
+
+  /* =========================
+     Rendu
+     ========================= */
   return (
     <div className="container py-6 space-y-4">
       <div className="text-xs text-zinc-500 uppercase tracking-wider">Mes habitudes & routine</div>
       <h1 className="text-2xl font-bold">Habitudes</h1>
 
-      {/* Onglets sticky (K1) */}
+      {/* Onglets sticky */}
       <div className="sticky-tabs mt-2">
         <div className="sticky-tabs-inner inline-flex gap-1">
           <button onClick={()=>setTab('daily')}  className={`px-3 py-1.5 rounded-xl ${tab==='daily' ? 'text-white' : 'border border-transparent'}`} style={tab==='daily'?{background:'var(--accent)'}:{}} >
@@ -106,13 +164,22 @@ useEffect(()=> save(HABITS_KEY, habits), [habits])
 
       {tab==='daily' && (
         <div className="grid md:grid-cols-2 gap-4">
-          {/* Checklist + progress ring (C2) */}
+          {/* Checklist + progress + bouton Réinitialiser */}
           <Section
             title="Checklist du jour"
-            right={<div className="flex items-center gap-3">
-              <span className="badge">{Object.values(done).filter(Boolean).length}/{habits.length}</span>
-              <ProgressRing value={progress}/>
-            </div>}
+            right={
+              <div className="flex items-center gap-3">
+                <span className="badge">{Object.values(done).filter(Boolean).length}/{habits.length}</span>
+                <ProgressRing value={progress}/>
+                <button
+                  onClick={hardReset}
+                  className="px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-800 text-sm"
+                  title="Remettre à zéro les coches du jour"
+                >
+                  Réinitialiser
+                </button>
+              </div>
+            }
           >
             <div className="space-y-2">
               {habits.map(h => (
@@ -133,16 +200,17 @@ useEffect(()=> save(HABITS_KEY, habits), [habits])
             <div className="flex gap-2">
               <input value={newHabit} onChange={e=>setNewHabit(e.target.value)} placeholder="Nouvelle habitude"
                      className="border rounded-xl px-3 py-2 w-full dark:border-zinc-800"/>
-              <button onClick={addHabit} className="btn-accent">Ajouter</button>
+              <button onClick={addHabit} className="px-3 py-2 rounded-xl text-white" style={{background:'var(--accent)'}}>Ajouter</button>
             </div>
           </Section>
 
-          {/* Checklist générée depuis la routine du jour (H1) */}
-          <Section title={`Aujourd’hui — ${wdLabel[todayWd]}`} right={<span className="badge">{todayList.length} étapes</span>}>
+          {/* Checklist générée depuis la routine du jour */}
+          <Section title={`Aujourd’hui — ${wdLabel[wd[new Date().getDay()] ]}`} right={<span className="badge">{todayList.length} étapes</span>}>
             <div className="space-y-2">
               {todayList.map(it => (
                 <label key={it.id} className="flex items-center gap-3 rounded-xl border p-3 dark:border-zinc-800">
-                  <input type="checkbox" className="h-5 w-5" checked={!!todayCheck[it.id]} onChange={()=>setTodayCheck(s=>({...s, [it.id]: !s[it.id]}))}/>
+                  <input type="checkbox" className="h-5 w-5" checked={!!todayCheck[it.id]}
+                         onChange={()=>setTodayCheck(s=>({...s, [it.id]: !s[it.id]}))}/>
                   <span className="font-medium tabular-nums">{it.time}</span>
                   <span>{it.text}</span>
                 </label>
