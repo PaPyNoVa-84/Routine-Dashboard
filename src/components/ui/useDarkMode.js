@@ -1,18 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-export function useDarkMode() {
+export default function useDarkMode() {
   const [dark, setDark] = useState(() => {
-    return localStorage.getItem('theme') === 'dark';
+    const saved = localStorage.getItem("darkMode");
+    return saved ? JSON.parse(saved) : false;
   });
 
   useEffect(() => {
     if (dark) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
+      document.documentElement.classList.add("dark");
     } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
+      document.documentElement.classList.remove("dark");
     }
+    localStorage.setItem("darkMode", JSON.stringify(dark));
   }, [dark]);
 
   return [dark, setDark];
