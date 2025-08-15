@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react'
 import { motion } from 'framer-motion'
 import { Brain, SunMedium, Moon, CheckSquare, Target, CalendarDays, NotebookPen, BookOpen, Dumbbell, Apple, Settings, ChevronRight } from 'lucide-react'
 import { Routes, Route, Link, useLocation } from 'react-router-dom'
+import Habits from './pages/Habits'
 
 
 function useDarkMode(){
