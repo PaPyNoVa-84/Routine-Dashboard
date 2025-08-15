@@ -60,7 +60,9 @@ export default function Habits(){
   const [tab, setTab] = useState('daily') // daily | week
 
   /* Habitudes (D1) */
-  const [habits, setHabits] = useState(()=> load('habits:list', defaultHabits))
+const HABITS_KEY = 'habits:list:v2' // <- nouvelle version
+const [habits, setHabits] = useState(()=> load(HABITS_KEY, defaultHabits))
+useEffect(()=> save(HABITS_KEY, habits), [habits])
   const [done, setDone] = useState(()=> load('habits:done:'+todayKey(), {}))
   const [newHabit, setNewHabit] = useState('')
   useEffect(()=> save('habits:list', habits), [habits])
