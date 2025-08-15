@@ -35,7 +35,6 @@ const defaultHabits = [
 ]
 
 /* ========= Routine hebdo par défaut (planning simplifié) ========= */
-/* IMPORTANT: clés en anglais (Mon..Sun) pour le code, libellés FR pour l’affichage */
 const defaultTemplate = {
   Mon: [
     { id: 'mo1', time: '09:00', text: 'Réveil + hydratation' },
@@ -194,10 +193,18 @@ export default function Habits(){
   const rmStep = (day,id) => setTmpl(t => ({ ...t, [day]: (t[day]||[]).filter(x => x.id!==id) }))
   const updStep = (day,id,patch) => setTmpl(t => ({ ...t, [day]: (t[day]||[]).map(x => x.id===id ? { ...x, ...patch } : x) }))
 
-  // cases cochées "Aujourd’hui" (issues de la routine)
+  // cases cochées "Aujourd’hui" (issues de la routine) + sauvegarde par date
   const [todayCheck, setTodayCheck] = useState(()=> load('routine:done:'+todayKey(), {}))
   useEffect(()=> save('routine:done:'+todayKey(), todayCheck), [todayCheck])
-  const todayList = (tmpl[todayWd]||[]).sort((a,b)=> a.time.localeCompare(b.time))
+
+  // Liste du jour triée, avec 00:00 en bas
+  const todayList = (tmpl[todayWd]||[])
+    .slice()
+    .sort((a,b) => {
+      if (a.time === '00:00') return 1
+      if (b.time === '00:00') return -1
+      return a.time.localeCompare(b.time)
+    })
 
   /* ======= REMISES À ZÉRO ======= */
 
@@ -305,8 +312,12 @@ export default function Habits(){
             <div className="space-y-2">
               {todayList.map(it => (
                 <label key={it.id} className="flex items-center gap-3 rounded-xl border p-3 dark:border-zinc-800">
-                  <input type="checkbox" className="h-5 w-5" checked={!!todayCheck[it.id]}
-                         onChange={()=>setTodayCheck(s=>({...s, [it.id]: !s[it.id]}))}/>
+                  <input
+                    type="checkbox"
+                    className="h-5 w-5"
+                    checked={!!todayCheck[it.id]}
+                    onChange={()=>setTodayCheck(s=>({...s, [it.id]: !s[it.id]}))}
+                  />
                   <span className="font-medium tabular-nums">{it.time}</span>
                   <span>{it.text}</span>
                 </label>
@@ -333,13 +344,26 @@ export default function Habits(){
             <button onClick={()=>addStep(currentDay)} className="px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-800">+ Étape</button>
           }>
             <div className="space-y-2">
-              {(tmpl[currentDay]||[]).sort((a,b)=>a.time.localeCompare(b.time)).map(it => (
-                <div key={it.id} className="flex items-center gap-2 border rounded-xl p-2 dark:border-zinc-800">
-                  <input type="time" value={it.time} onChange={e=>updStep(currentDay, it.id, { time:e.target.value })} className="border rounded-xl px-2 py-1 dark:border-zinc-800"/>
-                  <input value={it.text} onChange={e=>updStep(currentDay, it.id, { text:e.target.value })} className="border rounded-xl px-3 py-1 w-full dark:border-zinc-800"/>
-                  <button onClick={()=>rmStep(currentDay, it.id)} className="px-2 py-1 rounded-xl border border-zinc-200 dark:border-zinc-800">Suppr</button>
-                </div>
-              ))}
+              {(tmpl[currentDay]||[])
+                .slice()
+                .sort((a,b) => {
+                  if (a.time === '00:00') return 1
+                  if (b.time === '00:00') return -1
+                  return a.time.localeCompare(b.time)
+                })
+                .map(it => (
+                  <div key={it.id} className="flex items-center gap-2 border rounded-xl p-2 dark:border-zinc-800">
+                    <input
+                      type="checkbox"
+                      className="h-5 w-5"
+                      checked={!!todayCheck[it.id]}
+                      onChange={()=>setTodayCheck(s=>({...s, [it.id]: !s[it.id]}))}
+                    />
+                    <input type="time" value={it.time} onChange={e=>updStep(currentDay, it.id, { time:e.target.value })} className="border rounded-xl px-2 py-1 dark:border-zinc-800"/>
+                    <input value={it.text} onChange={e=>updStep(currentDay, it.id, { text:e.target.value })} className="border rounded-xl px-3 py-1 w-full dark:border-zinc-800"/>
+                    <button onClick={()=>rmStep(currentDay, it.id)} className="px-2 py-1 rounded-xl border border-zinc-200 dark:border-zinc-800">Suppr</button>
+                  </div>
+                ))}
               {(!tmpl[currentDay] || tmpl[currentDay].length===0) && <div className="text-sm text-zinc-500">Aucune étape — ajoute ta première avec “+ Étape”.</div>}
             </div>
           </Section>
