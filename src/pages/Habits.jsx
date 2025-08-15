@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react'
 
-/* ========= helpers date & storage ========= */
+/* ========= Helpers date & storage ========= */
 const todayKey = () => new Date().toISOString().slice(0,10)
 const load = (k, f) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : f } catch { return f } }
 const save = (k, v) => localStorage.setItem(k, JSON.stringify(v))
 
-/* Temps restant jusqu’à minuit (pour le reset quotidien des habitudes) */
+/* Temps restant jusqu’à minuit (reset quotidien des habitudes) */
 function msUntilMidnight() {
   const now = new Date()
   const next = new Date(now)
@@ -13,12 +13,11 @@ function msUntilMidnight() {
   return next.getTime() - now.getTime()
 }
 
-/* Temps restant jusqu’au prochain lundi 00:00 (pour le reset hebdo de la routine) */
+/* Temps restant jusqu’au prochain lundi 00:00 (reset hebdo routine) */
 function msUntilNextMonday() {
   const now = new Date()
   const next = new Date(now)
-  const day = now.getDay() // 0=dim, 1=lun,...6=sam
-  // nb de jours à ajouter pour atteindre lundi (1)
+  const day = now.getDay() // 0=dim, 1=lun, ...6=sam
   const add = (8 - day) % 7 || 7
   next.setDate(now.getDate() + add)
   next.setHours(0, 0, 0, 0)
@@ -35,75 +34,71 @@ const defaultHabits = [
   { id:'h_stretch', name:'Étirements' },
 ]
 
-/* ========= Routine hebdo par défaut ========= */
+/* ========= Routine hebdo par défaut (planning simplifié) ========= */
+/* IMPORTANT: clés en anglais (Mon..Sun) pour le code, libellés FR pour l’affichage */
 const defaultTemplate = {
-  Lundi: [
-    { id: 'lu1', time: '09:00', text: 'Réveil + hydratation' },
-    { id: 'lu2', time: '09:30', text: 'Étirements + fruits' },
-    { id: 'lu3', time: '10:00', text: 'Sport (natation/muscu maison)' },
-    { id: 'lu4', time: '11:30', text: 'Douche + skincare' },
-    { id: 'lu5', time: '12:00', text: 'Repas healthy' },
-    { id: 'lu6', time: '13:00', text: 'Deep work Pinterest/Shopify' },
-    { id: 'lu7', time: '16:00', text: 'Pause / Gaming' },
-    { id: 'lu8', time: '19:00', text: 'Repas' },
-    { id: 'lu9', time: '22:30', text: 'Douche chaude' },
-    { id: 'lu10', time: '23:00', text: 'Film' },
-    { id: 'lu11', time: '00:00', text: 'Coucher' },
+  Mon: [
+    { id: 'mo1', time: '09:00', text: 'Réveil + hydratation' },
+    { id: 'mo2', time: '09:30', text: 'Étirements + fruits' },
+    { id: 'mo3', time: '10:00', text: 'Sport (natation/muscu maison)' },
+    { id: 'mo4', time: '11:30', text: 'Douche + skincare' },
+    { id: 'mo5', time: '12:00', text: 'Repas healthy' },
+    { id: 'mo6', time: '13:00', text: 'Deep work Pinterest/Shopify' },
+    { id: 'mo7', time: '16:00', text: 'Pause / Gaming' },
+    { id: 'mo8', time: '19:00', text: 'Repas' },
+    { id: 'mo9', time: '22:30', text: 'Douche chaude' },
+    { id: 'mo10', time: '23:00', text: 'Film' },
+    { id: 'mo11', time: '00:00', text: 'Coucher' },
   ],
-
-  Mardi: [
-    { id: 'ma1', time: '09:00', text: 'Réveil + hydratation' },
-    { id: 'ma2', time: '09:30', text: 'Étirements + fruits' },
-    { id: 'ma3', time: '10:00', text: 'Stats Pinterest' },
-    { id: 'ma4', time: '11:00', text: 'Natation' },
-    { id: 'ma5', time: '12:30', text: 'Repas healthy' },
-    { id: 'ma6', time: '14:00', text: 'Deep work Pinterest/Shopify' },
-    { id: 'ma7', time: '16:30', text: 'Gaming' },
-    { id: 'ma8', time: '19:00', text: 'Repas' },
-    { id: 'ma9', time: '22:30', text: 'Douche chaude' },
-    { id: 'ma10', time: '23:00', text: 'Film' },
-    { id: 'ma11', time: '00:00', text: 'Coucher' },
+  Tue: [
+    { id: 'tu1', time: '09:00', text: 'Réveil + hydratation' },
+    { id: 'tu2', time: '09:30', text: 'Étirements + fruits' },
+    { id: 'tu3', time: '10:00', text: 'Stats Pinterest' },
+    { id: 'tu4', time: '11:00', text: 'Natation' },
+    { id: 'tu5', time: '12:30', text: 'Repas healthy' },
+    { id: 'tu6', time: '14:00', text: 'Deep work Pinterest/Shopify' },
+    { id: 'tu7', time: '16:30', text: 'Gaming' },
+    { id: 'tu8', time: '19:00', text: 'Repas' },
+    { id: 'tu9', time: '22:30', text: 'Douche chaude' },
+    { id: 'tu10', time: '23:00', text: 'Film' },
+    { id: 'tu11', time: '00:00', text: 'Coucher' },
   ],
-
-  Mercredi: [
-    { id: 'me1', time: '10:30', text: 'Réveil + hydratation + étirements + fruits' },
-    { id: 'me2', time: '11:30', text: 'Natation / repas' },
-    { id: 'me3', time: '14:00', text: 'Famille' },
-    { id: 'me4', time: '20:00', text: 'Repas' },
-    { id: 'me5', time: '22:30', text: 'Douche chaude' },
-    { id: 'me6', time: '23:00', text: 'Film' },
-    { id: 'me7', time: '00:00', text: 'Coucher' },
+  Wed: [
+    { id: 'we1', time: '10:30', text: 'Réveil + hydratation + étirements + fruits' },
+    { id: 'we2', time: '11:30', text: 'Natation / repas' },
+    { id: 'we3', time: '14:00', text: 'Famille' },
+    { id: 'we4', time: '20:00', text: 'Repas' },
+    { id: 'we5', time: '22:30', text: 'Douche chaude' },
+    { id: 'we6', time: '23:00', text: 'Film' },
+    { id: 'we7', time: '00:00', text: 'Coucher' },
   ],
-
-  Jeudi: [
-    { id: 'je1', time: '09:00', text: 'Réveil + hydratation' },
-    { id: 'je2', time: '09:30', text: 'Étirements + fruits' },
-    { id: 'je3', time: '10:00', text: 'Sport (natation/muscu maison)' },
-    { id: 'je4', time: '11:30', text: 'Douche + skincare' },
-    { id: 'je5', time: '12:00', text: 'Repas healthy' },
-    { id: 'je6', time: '13:00', text: 'Deep work Pinterest/Shopify' },
-    { id: 'je7', time: '15:30', text: 'Gaming' },
-    { id: 'je8', time: '19:00', text: 'Repas' },
-    { id: 'je9', time: '22:30', text: 'Douche chaude' },
-    { id: 'je10', time: '23:00', text: 'Film' },
-    { id: 'je11', time: '00:00', text: 'Coucher' },
+  Thu: [
+    { id: 'th1', time: '09:00', text: 'Réveil + hydratation' },
+    { id: 'th2', time: '09:30', text: 'Étirements + fruits' },
+    { id: 'th3', time: '10:00', text: 'Sport (natation/muscu maison)' },
+    { id: 'th4', time: '11:30', text: 'Douche + skincare' },
+    { id: 'th5', time: '12:00', text: 'Repas healthy' },
+    { id: 'th6', time: '13:00', text: 'Deep work Pinterest/Shopify' },
+    { id: 'th7', time: '15:30', text: 'Gaming' },
+    { id: 'th8', time: '19:00', text: 'Repas' },
+    { id: 'th9', time: '22:30', text: 'Douche chaude' },
+    { id: 'th10', time: '23:00', text: 'Film' },
+    { id: 'th11', time: '00:00', text: 'Coucher' },
   ],
-
-  Vendredi: [
-    { id: 've1', time: '09:00', text: 'Réveil + hydratation' },
-    { id: 've2', time: '09:30', text: 'Étirements + fruits' },
-    { id: 've3', time: '10:00', text: 'Sport (natation/muscu maison)' },
-    { id: 've4', time: '11:30', text: 'Douche + skincare' },
-    { id: 've5', time: '12:00', text: 'Repas healthy' },
-    { id: 've6', time: '13:00', text: 'Deep work Pinterest/Shopify' },
-    { id: 've7', time: '15:30', text: 'Gaming' },
-    { id: 've8', time: '19:00', text: 'Repas' },
-    { id: 've9', time: '22:30', text: 'Douche chaude' },
-    { id: 've10', time: '23:00', text: 'Film' },
-    { id: 've11', time: '00:00', text: 'Coucher' },
+  Fri: [
+    { id: 'fr1', time: '09:00', text: 'Réveil + hydratation' },
+    { id: 'fr2', time: '09:30', text: 'Étirements + fruits' },
+    { id: 'fr3', time: '10:00', text: 'Sport (natation/muscu maison)' },
+    { id: 'fr4', time: '11:30', text: 'Douche + skincare' },
+    { id: 'fr5', time: '12:00', text: 'Repas healthy' },
+    { id: 'fr6', time: '13:00', text: 'Deep work Pinterest/Shopify' },
+    { id: 'fr7', time: '15:30', text: 'Gaming' },
+    { id: 'fr8', time: '19:00', text: 'Repas' },
+    { id: 'fr9', time: '22:30', text: 'Douche chaude' },
+    { id: 'fr10', time: '23:00', text: 'Film' },
+    { id: 'fr11', time: '00:00', text: 'Coucher' },
   ],
-
-  Samedi: [
+  Sat: [
     { id: 'sa1', time: '09:00', text: 'Réveil + hydratation' },
     { id: 'sa2', time: '09:30', text: 'Étirements + fruits' },
     { id: 'sa3', time: '10:00', text: 'Sport (natation/muscu maison)' },
@@ -116,19 +111,18 @@ const defaultTemplate = {
     { id: 'sa10', time: '23:00', text: 'Film' },
     { id: 'sa11', time: '00:00', text: 'Coucher' },
   ],
+  Sun: [
+    { id: 'su1', time: '10:30', text: 'Réveil + hydratation + étirements + fruits' },
+    { id: 'su2', time: '11:30', text: 'Natation / repas' },
+    { id: 'su3', time: '14:00', text: 'Famille' },
+    { id: 'su4', time: '20:00', text: 'Repas' },
+    { id: 'su5', time: '22:30', text: 'Douche chaude' },
+    { id: 'su6', time: '23:00', text: 'Film' },
+    { id: 'su7', time: '00:00', text: 'Coucher' },
+  ],
+}
 
-  Dimanche: [
-    { id: 'di1', time: '10:30', text: 'Réveil + hydratation + étirements + fruits' },
-    { id: 'di2', time: '11:30', text: 'Natation / repas' },
-    { id: 'di3', time: '14:00', text: 'Famille' },
-    { id: 'di4', time: '20:00', text: 'Repas' },
-    { id: 'di5', time: '22:30', text: 'Douche chaude' },
-    { id: 'di6', time: '23:00', text: 'Film' },
-    { id: 'di7', time: '00:00', text: 'Coucher' },
-  ]
-};
-
-
+/* Ordre des jours & libellés FR */
 const wd = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
 const wdLabel = { Mon:'Lundi', Tue:'Mardi', Wed:'Mercredi', Thu:'Jeudi', Fri:'Vendredi', Sat:'Samedi', Sun:'Dimanche' }
 
@@ -184,7 +178,7 @@ export default function Habits(){
   const progress = useMemo(()=> habits.length ? Object.values(done).filter(Boolean).length / habits.length : 0, [done, habits])
 
   /* --- ROUTINE HEBDO (reset chaque lundi 00:00) --- */
-  const ROUTINE_KEY = 'routine:template:v2'
+  const ROUTINE_KEY = 'routine:template:v3' // bump -> charge ces nouveaux defaults
   const [tmpl, setTmpl] = useState(()=> load(ROUTINE_KEY, defaultTemplate))
   useEffect(()=> save(ROUTINE_KEY, tmpl), [tmpl])
 
@@ -240,7 +234,7 @@ export default function Habits(){
     // Au chargement : si on est lundi ET que ce n'est pas déjà fait aujourd'hui -> reset
     const now = new Date()
     const isMonday = now.getDay() === 1
-    const lastMonday = localStorage.getItem('routine:lastMonday') // YYYY-MM-DD
+    const lastMonday = localStorage.getItem('routine:lastMonday')
     const today = todayKey()
     if (isMonday && lastMonday !== today) resetWeeklyRoutine()
 
