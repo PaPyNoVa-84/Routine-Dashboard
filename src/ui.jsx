@@ -3,6 +3,8 @@ import { Routes, Route, useLocation, Link } from 'react-router-dom'
 import { useDarkMode } from './components/ui/useDarkMode'
 import Home from './pages/home'
 import Habits from './pages/habits'
+import { useDarkMode } from './components/ui/useDarkMode';
+
 
 export default function App(){
   const [dark, setDark] = useDarkMode()
