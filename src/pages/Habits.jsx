@@ -24,12 +24,63 @@ const defaultHabits = [
    ========================= */
 const defaultTemplate = {
   Mon: [
-    { id:'mo1', time:'08:00', text:'Hydratation + lumière du jour' },
-    { id:'mo2', time:'09:00', text:'Deep Work — 2h' },
-    { id:'mo3', time:'18:00', text:'Sport / Étirements' },
+    { id:'mo1', time:'07:45', text:'Hydratation + lumière du jour' },
+    { id:'mo2', time:'08:00', text:'Étirements (5–10 min)' },
+    { id:'mo3', time:'09:00', text:'Deep Work — 2h travail' },
+    { id:'mo4', time:'12:30', text:'Tâches ménagères 20 min' },
+    { id:'mo5', time:'18:00', text:'Sport 30–60 min' },
+    { id:'mo6', time:'22:15', text:'Famille / déconnexion' },
   ],
-  Tue: [], Wed: [], Thu: [], Fri: [], Sat: [], Sun: [],
+  Tue: [
+    { id:'tu1', time:'07:45', text:'Hydratation' },
+    { id:'tu2', time:'08:00', text:'Marche rapide 10 min' },
+    { id:'tu3', time:'09:00', text:'Deep Work — 2h travail' },
+    { id:'tu4', time:'11:30', text:'Étirements 5–10 min' },
+    { id:'tu5', time:'16:30', text:'Tâches ménagères 20 min' },
+    { id:'tu6', time:'18:30', text:'Sport 30–60 min' },
+    { id:'tu7', time:'22:15', text:'Famille / déconnexion' },
+  ],
+  Wed: [
+    { id:'we1', time:'07:45', text:'Hydratation' },
+    { id:'we2', time:'08:00', text:'Étirements 5–10 min' },
+    { id:'we3', time:'09:00', text:'Deep Work — 2h travail' },
+    { id:'we4', time:'12:30', text:'Famille / appel / message' },
+    { id:'we5', time:'17:30', text:'Marche 20 min' },
+    { id:'we6', time:'18:00', text:'Sport 30–60 min' },
+  ],
+  Thu: [
+    { id:'th1', time:'07:45', text:'Hydratation' },
+    { id:'th2', time:'08:00', text:'Étirements 5–10 min' },
+    { id:'th3', time:'09:00', text:'Deep Work — 2h travail' },
+    { id:'th4', time:'12:30', text:'Tâches ménagères 20 min' },
+    { id:'th5', time:'17:30', text:'Marche 20 min' },
+    { id:'th6', time:'18:30', text:'Sport 30–60 min' },
+    { id:'th7', time:'22:00', text:'Famille / temps calme' },
+  ],
+  Fri: [
+    { id:'fr1', time:'07:45', text:'Hydratation' },
+    { id:'fr2', time:'08:00', text:'Étirements 5–10 min' },
+    { id:'fr3', time:'09:00', text:'Deep Work — 2h travail' },
+    { id:'fr4', time:'12:00', text:'Tâches ménagères 20 min' },
+    { id:'fr5', time:'17:30', text:'Marche 20 min' },
+    { id:'fr6', time:'18:00', text:'Sport 30–60 min' },
+    { id:'fr7', time:'22:15', text:'Famille / film' },
+  ],
+  Sat: [
+    { id:'sa1', time:'09:00', text:'Hydratation + balade' },
+    { id:'sa2', time:'10:30', text:'Tâches ménagères 30 min' },
+    { id:'sa3', time:'11:30', text:'Famille / sortie' },
+    { id:'sa4', time:'17:30', text:'Marche 20 min' },
+    { id:'sa5', time:'18:00', text:'Étirements 10 min' },
+  ],
+  Sun: [
+    { id:'su1', time:'09:30', text:'Hydratation + étirements' },
+    { id:'su2', time:'10:30', text:'Famille / préparation semaine' },
+    { id:'su3', time:'17:00', text:'Marche 20 min' },
+    { id:'su4', time:'21:45', text:'Déconnexion / sommeil' },
+  ],
 }
+
 const wd = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
 const wdLabel = { Mon:'Lundi', Tue:'Mardi', Wed:'Mercredi', Thu:'Jeudi', Fri:'Vendredi', Sat:'Samedi', Sun:'Dimanche' }
 
