@@ -1,13 +1,13 @@
-import React, {useEffect, useState} from 'react'
+import React, { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Brain, SunMedium, Moon, CheckSquare, Target, CalendarDays, NotebookPen, BookOpen, Dumbbell, Apple, Settings, ChevronRight } from 'lucide-react'
+import { Brain, SunMedium, Moon, CheckSquare, Target, CalendarDays, Dumbbell, Apple, Settings, ChevronRight } from 'lucide-react'
 import { Routes, Route, Link, useLocation } from 'react-router-dom'
-import Habits from './pages/Habits'
+import Habits from './pages/Habits'   // <- notre page Habitudes
 
-
+// --- Dark mode small helper ---
 function useDarkMode(){
   const [dark, setDark] = useState(()=>{
-    try { return JSON.parse(localStorage.getItem('darkMode')||'false') } catch { return false }
+    try { return JSON.parse(localStorage.getItem('darkMode')) || false } catch { return false }
   })
   useEffect(()=>{
     localStorage.setItem('darkMode', JSON.stringify(dark))
@@ -17,6 +17,7 @@ function useDarkMode(){
   return [dark, setDark]
 }
 
+// --- Tuiles de l'accueil (lectures/études retirées) ---
 const tiles = [
   { id: 'habits',   href: '/habits',   icon: <CheckSquare className='icon-tile' />, title: 'Mes habitudes', subtitle: '& ma to-do list' },
   { id: 'goals',    href: '/goals',    icon: <Target className='icon-tile' />,      title: 'Mes objectifs', subtitle: '& mes notes' },
@@ -24,11 +25,10 @@ const tiles = [
   { id: 'todo',     href: '/todo',     icon: <CheckSquare className='icon-tile' />, title: 'Ma to-do',      subtitle: 'aujourd’hui & semaine' },
   { id: 'training', href: '/training', icon: <Dumbbell className='icon-tile' />,    title: 'Entraînement',  subtitle: 'sport & progrès' },
   { id: 'health',   href: '/health',   icon: <Apple className='icon-tile' />,       title: 'Santé',         subtitle: 'sommeil & routine' },
-  { id: 'settings', href: '/settings', icon: <Cog className='icon-tile' />,         title: 'Réglages',      subtitle: 'thème & presets' },
+  { id: 'settings', href: '/settings', icon: <Settings className='icon-tile' />,    title: 'Réglages',      subtitle: 'thème & presets' },
 ]
 
-
-
+// --- Composant tuile cliquable ---
 function Tile({icon, title, subtitle, href}) {
   return (
     <motion.div whileHover={{ y: -2 }} className="card w-full p-5 md:p-6 text-left">
@@ -48,69 +48,52 @@ function Tile({icon, title, subtitle, href}) {
   )
 }
 
-
-export default function App(){
-  const [dark, setDark] = useDarkMode()
-  const today = new Date().toLocaleDateString('fr-FR', { weekday:'long', day:'2-digit', month:'long' })
-
+// --- Page d'accueil (grille de tuiles) ---
+function Home(){
+  const today = new Date()
+  const dateFmt = today.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' })
   return (
-    <div className="min-h-screen">
-      {/* Top bar */}
-      <div className="sticky top-0 z-10 backdrop-blur supports-[backdrop-filter]:bg-white/60 bg-white/90 dark:bg-zinc-950/80 border-b border-zinc-200 dark:border-zinc-800">
-        <div className="container flex items-center justify-between h-14">
-          <div className="flex items-center gap-2 font-semibold">
-            <Brain className="h-5 w-5 text-pink-500" />
-            <span>2ᵉ CERVEAU</span>
-          </div>
-          <button onClick={()=>setDark(d=>!d)} className="badge flex items-center gap-1">{dark ? <SunMedium className="h-4 w-4"/> : <Moon className="h-4 w-4"/>}{dark ? 'Clair' : 'Sombre'}</button>
+    <div className="container py-6 space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Brain className="h-6 w-6" />
+          <div className="text-xs text-zinc-500 uppercase tracking-wider">Aujourd’hui — {dateFmt}</div>
         </div>
       </div>
 
-      {/* Header */}
-      <header className="container py-8 md:py-10">
-        <div className="rounded-3xl overflow-hidden relative">
-          <div className="h-28 md:h-36 bg-gradient-to-r from-zinc-200 via-zinc-100 to-zinc-200 dark:from-zinc-900 dark:via-zinc-900 dark:to-zinc-900" />
-          <div className="absolute inset-0">
-            <div className="container h-full flex items-end pb-4">
-              <div>
-                <div className="text-xs uppercase tracking-wider text-zinc-500">Aujourd’hui — {today}</div>
-                <h1 className="text-2xl md:text-3xl font-bold">Ton tableau de bord</h1>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
+      <h1 className="text-2xl font-bold mb-2">Ton tableau de bord</h1>
 
-      {/* Tiles grid */}
-      <main className="container pb-16">
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-5">
-          {tiles.map(t => <Tile key={t.id} {...t} />)}
-        </div>
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {tiles.map(t => <Tile key={t.id} {...t} />)}
+      </div>
+    </div>
+  )
+}
 
-        {/* Quick sections */}
-        <div className="mt-8 grid md:grid-cols-2 gap-4">
-          <div className="card p-5 md:p-6">
-            <div className="flex items-center justify-between mb-3">
-              <div className="font-semibold">Raccourcis</div>
-              <span className="badge">Personnalisables</span>
-            </div>
-            <div className="flex flex-wrap gap-2 text-sm">
-              {['+ Tâche rapide','+ Objectif','Ouvrir calendrier','Notes du jour','Routine soir'].map(x=>(
-                <button key={x} className="px-3 py-1.5 rounded-xl border border-zinc-200 hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-800">{x}</button>
-              ))}
-            </div>
-          </div>
-          <div className="card p-5 md:p-6">
-            <div className="flex items-center justify-between mb-3">
-              <div className="font-semibold">Astuce du jour</div>
-              <span className="badge">Discipline</span>
-            </div>
-            <p className="text-sm text-zinc-600 dark:text-zinc-300">
-              Commence par 3 micro‑actions faciles que tu peux cocher en 10 minutes. L’élan > la motivation.
-            </p>
-          </div>
+// --- App avec ROUTES ---
+export default function App(){
+  const [dark, setDark] = useDarkMode()
+  const location = useLocation()
+
+  return (
+    <div className="min-h-screen bg-white text-black dark:bg-zinc-950 dark:text-white">
+      {/* topbar simple */}
+      <div className="sticky top-0 z-10 backdrop-blur bg-white/70 dark:bg-zinc-950/70 border-b border-zinc-200 dark:border-zinc-800">
+        <div className="container py-3 flex items-center justify-between">
+          <div className="font-semibold flex items-center gap-2"><Brain className="h-5 w-5"/><span>2ᵉ CERVEAU</span></div>
+          <button onClick={()=>setDark(!dark)} className="px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-800 text-sm">
+            {dark ? 'Clair' : 'Sombre'}
+          </button>
         </div>
-      </main>
+      </div>
+
+      {/* ROUTES */}
+      <Routes location={location}>
+        <Route path="/" element={<Home/>} />
+        <Route path="/habits" element={<Habits/>} />
+        {/* tu pourras ajouter ici : goals, calendar, todo, training, health, settings */}
+        <Route path="*" element={<Home/>} />
+      </Routes>
     </div>
   )
 }
