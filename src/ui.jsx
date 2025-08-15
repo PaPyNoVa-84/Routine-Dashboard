@@ -24,8 +24,9 @@ const tiles = [
   { id: 'todo',     href: '/todo',     icon: <CheckSquare className='icon-tile' />, title: 'Ma to-do',      subtitle: 'aujourd’hui & semaine' },
   { id: 'training', href: '/training', icon: <Dumbbell className='icon-tile' />,    title: 'Entraînement',  subtitle: 'sport & progrès' },
   { id: 'health',   href: '/health',   icon: <Apple className='icon-tile' />,       title: 'Santé',         subtitle: 'sommeil & routine' },
-  { id: 'settings', href: '/settings', icon: <Settings className='icon-tile' />,    title: 'Réglages',      subtitle: 'thème & presets' },
+  { id: 'settings', href: '/settings', icon: <Cog className='icon-tile' />,         title: 'Réglages',      subtitle: 'thème & presets' },
 ]
+
 
 
 function Tile({icon, title, subtitle, href}) {
