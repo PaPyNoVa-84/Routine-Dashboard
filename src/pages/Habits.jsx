@@ -37,63 +37,97 @@ const defaultHabits = [
 
 /* ========= Routine hebdo par défaut ========= */
 const defaultTemplate = {
-  Mon: [
-    { id:'mo1', time:'07:45', text:'Hydratation + lumière du jour' },
-    { id:'mo2', time:'08:00', text:'Étirements (5–10 min)' },
-    { id:'mo3', time:'09:00', text:'Deep Work — 2h travail' },
-    { id:'mo4', time:'12:30', text:'Tâches ménagères 20 min' },
-    { id:'mo5', time:'18:00', text:'Sport 30–60 min' },
-    { id:'mo6', time:'22:15', text:'Famille / déconnexion' },
+  Lundi: [
+    { id: 'lu1', time: '09:00', text: 'Réveil + hydratation' },
+    { id: 'lu2', time: '09:30', text: 'Étirements + fruits' },
+    { id: 'lu3', time: '10:00', text: 'Sport (natation/muscu maison)' },
+    { id: 'lu4', time: '11:30', text: 'Douche + skincare' },
+    { id: 'lu5', time: '12:00', text: 'Repas healthy' },
+    { id: 'lu6', time: '13:00', text: 'Deep work Pinterest/Shopify' },
+    { id: 'lu7', time: '16:00', text: 'Pause / Gaming' },
+    { id: 'lu8', time: '19:00', text: 'Repas' },
+    { id: 'lu9', time: '22:30', text: 'Douche chaude' },
+    { id: 'lu10', time: '23:00', text: 'Film' },
+    { id: 'lu11', time: '00:00', text: 'Coucher' },
   ],
-  Tue: [
-    { id:'tu1', time:'07:45', text:'Hydratation' },
-    { id:'tu2', time:'08:00', text:'Marche rapide 10 min' },
-    { id:'tu3', time:'09:00', text:'Deep Work — 2h travail' },
-    { id:'tu4', time:'11:30', text:'Étirements 5–10 min' },
-    { id:'tu5', time:'16:30', text:'Tâches ménagères 20 min' },
-    { id:'tu6', time:'18:30', text:'Sport 30–60 min' },
-    { id:'tu7', time:'22:15', text:'Famille / déconnexion' },
+
+  Mardi: [
+    { id: 'ma1', time: '09:00', text: 'Réveil + hydratation' },
+    { id: 'ma2', time: '09:30', text: 'Étirements + fruits' },
+    { id: 'ma3', time: '10:00', text: 'Stats Pinterest' },
+    { id: 'ma4', time: '11:00', text: 'Natation' },
+    { id: 'ma5', time: '12:30', text: 'Repas healthy' },
+    { id: 'ma6', time: '14:00', text: 'Deep work Pinterest/Shopify' },
+    { id: 'ma7', time: '16:30', text: 'Gaming' },
+    { id: 'ma8', time: '19:00', text: 'Repas' },
+    { id: 'ma9', time: '22:30', text: 'Douche chaude' },
+    { id: 'ma10', time: '23:00', text: 'Film' },
+    { id: 'ma11', time: '00:00', text: 'Coucher' },
   ],
-  Wed: [
-    { id:'we1', time:'07:45', text:'Hydratation' },
-    { id:'we2', time:'08:00', text:'Étirements 5–10 min' },
-    { id:'we3', time:'09:00', text:'Deep Work — 2h travail' },
-    { id:'we4', time:'12:30', text:'Famille / appel / message' },
-    { id:'we5', time:'17:30', text:'Marche 20 min' },
-    { id:'we6', time:'18:00', text:'Sport 30–60 min' },
+
+  Mercredi: [
+    { id: 'me1', time: '10:30', text: 'Réveil + hydratation + étirements + fruits' },
+    { id: 'me2', time: '11:30', text: 'Natation / repas' },
+    { id: 'me3', time: '14:00', text: 'Famille' },
+    { id: 'me4', time: '20:00', text: 'Repas' },
+    { id: 'me5', time: '22:30', text: 'Douche chaude' },
+    { id: 'me6', time: '23:00', text: 'Film' },
+    { id: 'me7', time: '00:00', text: 'Coucher' },
   ],
-  Thu: [
-    { id:'th1', time:'07:45', text:'Hydratation' },
-    { id:'th2', time:'08:00', text:'Étirements 5–10 min' },
-    { id:'th3', time:'09:00', text:'Deep Work — 2h travail' },
-    { id:'th4', time:'12:30', text:'Tâches ménagères 20 min' },
-    { id:'th5', time:'17:30', text:'Marche 20 min' },
-    { id:'th6', time:'18:30', text:'Sport 30–60 min' },
-    { id:'th7', time:'22:00', text:'Famille / temps calme' },
+
+  Jeudi: [
+    { id: 'je1', time: '09:00', text: 'Réveil + hydratation' },
+    { id: 'je2', time: '09:30', text: 'Étirements + fruits' },
+    { id: 'je3', time: '10:00', text: 'Sport (natation/muscu maison)' },
+    { id: 'je4', time: '11:30', text: 'Douche + skincare' },
+    { id: 'je5', time: '12:00', text: 'Repas healthy' },
+    { id: 'je6', time: '13:00', text: 'Deep work Pinterest/Shopify' },
+    { id: 'je7', time: '15:30', text: 'Gaming' },
+    { id: 'je8', time: '19:00', text: 'Repas' },
+    { id: 'je9', time: '22:30', text: 'Douche chaude' },
+    { id: 'je10', time: '23:00', text: 'Film' },
+    { id: 'je11', time: '00:00', text: 'Coucher' },
   ],
-  Fri: [
-    { id:'fr1', time:'07:45', text:'Hydratation' },
-    { id:'fr2', time:'08:00', text:'Étirements 5–10 min' },
-    { id:'fr3', time:'09:00', text:'Deep Work — 2h travail' },
-    { id:'fr4', time:'12:00', text:'Tâches ménagères 20 min' },
-    { id:'fr5', time:'17:30', text:'Marche 20 min' },
-    { id:'fr6', time:'18:00', text:'Sport 30–60 min' },
-    { id:'fr7', time:'22:15', text:'Famille / film' },
+
+  Vendredi: [
+    { id: 've1', time: '09:00', text: 'Réveil + hydratation' },
+    { id: 've2', time: '09:30', text: 'Étirements + fruits' },
+    { id: 've3', time: '10:00', text: 'Sport (natation/muscu maison)' },
+    { id: 've4', time: '11:30', text: 'Douche + skincare' },
+    { id: 've5', time: '12:00', text: 'Repas healthy' },
+    { id: 've6', time: '13:00', text: 'Deep work Pinterest/Shopify' },
+    { id: 've7', time: '15:30', text: 'Gaming' },
+    { id: 've8', time: '19:00', text: 'Repas' },
+    { id: 've9', time: '22:30', text: 'Douche chaude' },
+    { id: 've10', time: '23:00', text: 'Film' },
+    { id: 've11', time: '00:00', text: 'Coucher' },
   ],
-  Sat: [
-    { id:'sa1', time:'09:00', text:'Hydratation + balade' },
-    { id:'sa2', time:'10:30', text:'Tâches ménagères 30 min' },
-    { id:'sa3', time:'11:30', text:'Famille / sortie' },
-    { id:'sa4', time:'17:30', text:'Marche 20 min' },
-    { id:'sa5', time:'18:00', text:'Étirements 10 min' },
+
+  Samedi: [
+    { id: 'sa1', time: '09:00', text: 'Réveil + hydratation' },
+    { id: 'sa2', time: '09:30', text: 'Étirements + fruits' },
+    { id: 'sa3', time: '10:00', text: 'Sport (natation/muscu maison)' },
+    { id: 'sa4', time: '11:30', text: 'Douche + skincare' },
+    { id: 'sa5', time: '12:00', text: 'Repas healthy' },
+    { id: 'sa6', time: '13:00', text: 'Deep work Pinterest/Shopify' },
+    { id: 'sa7', time: '15:30', text: 'Gaming (long)' },
+    { id: 'sa8', time: '19:00', text: 'Repas' },
+    { id: 'sa9', time: '22:30', text: 'Douche chaude' },
+    { id: 'sa10', time: '23:00', text: 'Film' },
+    { id: 'sa11', time: '00:00', text: 'Coucher' },
   ],
-  Sun: [
-    { id:'su1', time:'09:30', text:'Hydratation + étirements' },
-    { id:'su2', time:'10:30', text:'Famille / préparation semaine' },
-    { id:'su3', time:'17:00', text:'Marche 20 min' },
-    { id:'su4', time:'21:45', text:'Déconnexion / sommeil' },
-  ],
-}
+
+  Dimanche: [
+    { id: 'di1', time: '10:30', text: 'Réveil + hydratation + étirements + fruits' },
+    { id: 'di2', time: '11:30', text: 'Natation / repas' },
+    { id: 'di3', time: '14:00', text: 'Famille' },
+    { id: 'di4', time: '20:00', text: 'Repas' },
+    { id: 'di5', time: '22:30', text: 'Douche chaude' },
+    { id: 'di6', time: '23:00', text: 'Film' },
+    { id: 'di7', time: '00:00', text: 'Coucher' },
+  ]
+};
+
 
 const wd = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
 const wdLabel = { Mon:'Lundi', Tue:'Mardi', Wed:'Mercredi', Thu:'Jeudi', Fri:'Vendredi', Sat:'Samedi', Sun:'Dimanche' }
