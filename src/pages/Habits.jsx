@@ -7,13 +7,14 @@ const save = (k, v) => localStorage.setItem(k, JSON.stringify(v))
 
 /* HABITUDES – ta liste (D1) */
 const defaultHabits = [
-  { id:'h_water', name:"Boire 1,5L d'eau" },
-  { id:'h_sport', name:'Sport 30–60 min' },
-  { id:'h_work2h', name:'2h travail' },
-  { id:'h_family', name:'Famille' },
-  { id:'h_house', name:'Tâches ménagères' },
-  { id:'h_stretch', name:'Étirements' },
-]
+  { id: 1, name: "Boire 1,5L d'eau" },
+  { id: 2, name: "Sport 30 min à 1h" },
+  { id: 3, name: "2h travail" },
+  { id: 4, name: "Famille" },
+  { id: 5, name: "Tâches ménagères" },
+  { id: 6, name: "Étirements" },
+];
+
 
 /* ROUTINE – simple liste avec heures (F1) */
 const defaultTemplate = {
