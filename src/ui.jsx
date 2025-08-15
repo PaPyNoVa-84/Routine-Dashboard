@@ -3,6 +3,8 @@ import { motion } from 'framer-motion'
 import { Brain, SunMedium, Moon, CheckSquare, Target, CalendarDays, Dumbbell, Apple, Settings, ChevronRight } from 'lucide-react'
 import { Routes, Route, Link, useLocation } from 'react-router-dom'
 import Habits from './pages/Habits'   // <- notre page Habitudes
+import { Link } from 'react-router-dom'
+
 
 // --- Dark mode small helper ---
 function useDarkMode(){
@@ -80,8 +82,18 @@ export default function App(){
       {/* topbar simple */}
       <div className="sticky top-0 z-10 backdrop-blur bg-white/70 dark:bg-zinc-950/70 border-b border-zinc-200 dark:border-zinc-800">
         <div className="container py-3 flex items-center justify-between">
-          <div className="font-semibold flex items-center gap-2"><Brain className="h-5 w-5"/><span>2ᵉ CERVEAU</span></div>
-          <button onClick={()=>setDark(!dark)} className="px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-800 text-sm">
+          
+          {/* LOGO cliquable vers l'accueil */}
+          <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+            <div className="font-semibold flex items-center gap-2">
+              <span className="h-5 w-5"/>2<sup>e</sup> <span>CERVEAU</span>
+            </div>
+          </Link>
+
+          <button 
+            onClick={() => setDark(!dark)} 
+            className="px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-800 text-sm"
+          >
             {dark ? 'Clair' : 'Sombre'}
           </button>
         </div>
@@ -89,10 +101,9 @@ export default function App(){
 
       {/* ROUTES */}
       <Routes location={location}>
-        <Route path="/" element={<Home/>} />
-        <Route path="/habits" element={<Habits/>} />
-        {/* tu pourras ajouter ici : goals, calendar, todo, training, health, settings */}
-        <Route path="*" element={<Home/>} />
+        <Route path="/" element={<Home />} />
+        <Route path="/habits" element={<Habits />} />
+        <Route path="*" element={<Home />} />
       </Routes>
     </div>
   )
